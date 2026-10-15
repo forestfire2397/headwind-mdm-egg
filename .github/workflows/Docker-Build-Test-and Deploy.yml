@@ -9,7 +9,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: forestfire2397/pterodactyl-egg-windrose
+  IMAGE_NAME: forestfire2397/headwind-mdm-egg
 
   permissions:
   contents: read
