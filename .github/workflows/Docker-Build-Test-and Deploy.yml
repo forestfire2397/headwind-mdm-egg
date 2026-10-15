@@ -40,7 +40,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ghcr.io/forestfire2397/pterodactyl-egg-windrose
+          images: ghcr.io/forestfire2397/headwind-mdm-egg
           tags: |
             type=raw,value=latest,enable={{is_default_branch}}
 
