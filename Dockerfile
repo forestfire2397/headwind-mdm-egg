@@ -9,11 +9,13 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/* \
     && mkdir -p /opt/headwind-ptero-defaults \
     && cp -a /usr/local/tomcat/webapps /opt/headwind-ptero-defaults/webapps \
-    && rm -rf /usr/local/tomcat/work /usr/local/tomcat/webapps /usr/local/tomcat/conf/Catalina/localhost \
+    && cp -a /usr/local/tomcat/conf/server.xml /opt/headwind-ptero-defaults/server.xml \
+    && rm -rf /usr/local/tomcat/work /usr/local/tomcat/webapps /usr/local/tomcat/conf/Catalina/localhost /usr/local/tomcat/conf/server.xml \
     && mkdir -p /home/container/headwind/work /home/container/headwind/webapps /home/container/headwind/config \
     && ln -s /home/container/headwind/work /usr/local/tomcat/work \
     && ln -s /home/container/headwind/webapps /usr/local/tomcat/webapps \
-    && ln -s /home/container/headwind/config /usr/local/tomcat/conf/Catalina/localhost
+    && ln -s /home/container/headwind/config /usr/local/tomcat/conf/Catalina/localhost \
+    && ln -s /home/container/headwind/server.xml /usr/local/tomcat/conf/server.xml
 
 COPY ptero-entrypoint.sh /ptero-entrypoint.sh
 RUN chmod 0755 /ptero-entrypoint.sh

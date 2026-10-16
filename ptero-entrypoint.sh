@@ -6,10 +6,26 @@ if [ -z "${CLOUDFLARE_TUNNEL_TOKEN:-}" ]; then
   exit 1
 fi
 
+# Bind the HTTP Connector to Pterodactyl's primary allocation. Wings maps
+# that allocated port onto the same port inside the container.
+SERVER_PORT=${SERVER_PORT:-8080}
+case "$SERVER_PORT" in
+  ''|*[!0-9]*) echo "ERROR: SERVER_PORT must be a numeric allocation port."; exit 1 ;;
+esac
+if [ "$SERVER_PORT" -lt 1 ] || [ "$SERVER_PORT" -gt 65535 ]; then
+  echo "ERROR: SERVER_PORT must be between 1 and 65535."
+  exit 1
+fi
+
 # Persist Tomcat's mutable files under Pterodactyl's writable server directory.
 mkdir -p /home/container/headwind/work/cache /home/container/headwind/work/files \
   /home/container/headwind/work/plugins /home/container/headwind/work/logs \
   /home/container/headwind/webapps /home/container/headwind/config
+
+# Generate a writable Tomcat config from the upstream image template every boot,
+# replacing its fixed HTTP port (8080) with the server's assigned allocation.
+sed "s/port=\"8080\"/port=\"${SERVER_PORT}\"/" \
+  /opt/headwind-ptero-defaults/server.xml > /home/container/headwind/server.xml
 
 # Restore bundled webapp defaults into the writable path on a fresh server.
 if [ -d /opt/headwind-ptero-defaults/webapps ] && [ -z "$(ls -A /home/container/headwind/webapps 2>/dev/null || true)" ]; then
