@@ -1,0 +1,167 @@
+{
+  "_comment": "Headwind MDM with cloudflared sidecar process; external PostgreSQL required. Update the custom image reference before importing.",
+  "meta": {
+    "version": "PTDL_v2",
+    "update_url": null
+  },
+  "exported_at": "2026-10-14T00:00:00+00:00",
+  "name": "Headwind MDM (Cloudflare Tunnel)",
+  "author": "dev@forestfire97.com",
+  "description": "Headwind MDM web panel using the upstream container, external PostgreSQL, and an in-container Cloudflare Tunnel.",
+  "features": null,
+  "docker_images": {
+    "Headwind custom image": "ghcr.io/forestfire2397/headwind-mdm-egg:latest"
+  },
+  "file_denylist": [],
+  "startup": "/ptero-entrypoint.sh",
+  "config": {
+    "files": "{}",
+    "startup": "{\n  \"done\": \"Server startup complete\"\n}",
+    "logs": "{}",
+    "stop": "^C"
+  },
+  "scripts": {
+    "installation": {
+      "script": "#!/bin/ash\necho 'This egg runs a prebuilt custom image. Build and publish it as described in the package README.'\n",
+      "container": "alpine:3.20",
+      "entrypoint": "ash"
+    }
+  },
+  "variables": [
+    {
+      "name": "Public domain",
+      "description": "Public Headwind hostname without scheme, e.g. mdm.example.com. Configure the Cloudflare Tunnel public hostname to http://localhost:8080.",
+      "env_variable": "BASE_DOMAIN",
+      "default_value": "mdm.example.com",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "required|string|max:253"
+    },
+    {
+      "name": "Cloudflare Tunnel token",
+      "description": "Token copied from the Cloudflare Zero Trust tunnel configuration. Secret value; required to start cloudflared.",
+      "env_variable": "CLOUDFLARE_TUNNEL_TOKEN",
+      "default_value": "",
+      "user_viewable": false,
+      "user_editable": true,
+      "rules": "required|string"
+    },
+    {
+      "name": "Database host",
+      "description": "Reachable PostgreSQL hostname/IP (e.g. the database server's private address).",
+      "env_variable": "SQL_HOST",
+      "default_value": "127.0.0.1",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "required|string|max:255"
+    },
+    {
+      "name": "Database port",
+      "description": "PostgreSQL TCP port.",
+      "env_variable": "SQL_PORT",
+      "default_value": "5432",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "required|integer|min:1|max:65535"
+    },
+    {
+      "name": "Database name",
+      "description": "Existing PostgreSQL database name.",
+      "env_variable": "SQL_BASE",
+      "default_value": "hmdm",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "required|string|max:63"
+    },
+    {
+      "name": "Database username",
+      "description": "PostgreSQL user with privileges on the Headwind database.",
+      "env_variable": "SQL_USER",
+      "default_value": "hmdm",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "required|string|max:63"
+    },
+    {
+      "name": "Database password",
+      "description": "PostgreSQL password.",
+      "env_variable": "SQL_PASS",
+      "default_value": "",
+      "user_viewable": false,
+      "user_editable": true,
+      "rules": "required|string"
+    },
+    {
+      "name": "SQL protocol for generated links",
+      "description": "Upstream container default. HTTP is used at the tunnel origin; enable HTTPS redirection at Cloudflare edge. Verify generated links after setup.",
+      "env_variable": "PROTOCOL",
+      "default_value": "http",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "required|in:http,https"
+    },
+    {
+      "name": "Headwind variant",
+      "description": "Upstream variant, normally os for the open-source distribution.",
+      "env_variable": "HMDM_VARIANT",
+      "default_value": "os",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "required|string|max:32"
+    },
+    {
+      "name": "Headwind WAR URL",
+      "description": "Upstream web application artifact URL; review before upgrades.",
+      "env_variable": "HMDM_URL",
+      "default_value": "https://h-mdm.com/files/hmdm-5.40.1-os.war",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "required|url|max:500"
+    },
+    {
+      "name": "Client version",
+      "description": "Version seeded in initial database configuration by upstream startup scripts.",
+      "env_variable": "CLIENT_VERSION",
+      "default_value": "6.37",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "required|string|max:32"
+    },
+    {
+      "name": "Admin email",
+      "description": "Email used in initial Headwind database setup.",
+      "env_variable": "ADMIN_EMAIL",
+      "default_value": "admin@example.com",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "required|email|max:254"
+    },
+    {
+      "name": "Shared secret",
+      "description": "Change from the upstream sample/default before production.",
+      "env_variable": "SHARED_SECRET",
+      "default_value": "change-this-secret",
+      "user_viewable": false,
+      "user_editable": true,
+      "rules": "required|string|min:16|max:256"
+    },
+    {
+      "name": "Force reconfigure",
+      "description": "Set true only when intentionally regenerating upstream config files; may overwrite persisted configuration.",
+      "env_variable": "FORCE_RECONFIGURE",
+      "default_value": "",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "nullable|in:true,false"
+    },
+    {
+      "name": "Install language",
+      "description": "Upstream initial data language (en or ru).",
+      "env_variable": "INSTALL_LANGUAGE",
+      "default_value": "en",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "required|in:en,ru"
+    }
+  ]
+}

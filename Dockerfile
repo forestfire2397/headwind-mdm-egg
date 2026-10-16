@@ -6,7 +6,10 @@ RUN apt-get update \
     && curl -fsSL https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb -o /tmp/cloudflared.deb \
     && apt-get install -y /tmp/cloudflared.deb \
     && rm -f /tmp/cloudflared.deb \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/* \
+    && rm -rf /usr/local/tomcat/work \
+    && mkdir -p /home/container/work \
+    && ln -s /home/container/work /usr/local/tomcat/work
 
 COPY ptero-entrypoint.sh /ptero-entrypoint.sh
 RUN chmod 0755 /ptero-entrypoint.sh
