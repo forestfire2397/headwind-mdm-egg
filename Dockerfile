@@ -1,4 +1,4 @@
-ROM headwindmdm/hmdm:0.1.9
+FROM headwindmdm/hmdm:0.1.9
 
 USER root
 RUN apt-get update \
