@@ -6,11 +6,11 @@
   },
   "exported_at": "2026-10-14T00:00:00+00:00",
   "name": "Headwind MDM (Cloudflare Tunnel)",
-  "author": "dev@forestfire97.com",
+  "author": "arena@example.invalid",
   "description": "Headwind MDM web panel using the upstream container, external PostgreSQL, and an in-container Cloudflare Tunnel.",
   "features": null,
   "docker_images": {
-    "Headwind custom image": "ghcr.io/forestfire2397/headwind-mdm-egg:latest"
+    "Headwind custom image (build and publish first)": "YOUR_REGISTRY/headwind-pterodactyl:0.1.9"
   },
   "file_denylist": [],
   "startup": "/ptero-entrypoint.sh",
@@ -152,7 +152,7 @@
       "default_value": "",
       "user_viewable": true,
       "user_editable": true,
-      "rules": "nullable|in:true,false"
+      "rules": "nullable|string|max:5"
     },
     {
       "name": "Install language",

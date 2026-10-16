@@ -6,19 +6,30 @@ if [ -z "${CLOUDFLARE_TUNNEL_TOKEN:-}" ]; then
   exit 1
 fi
 
-# Keep the upstream container's mutable work files in Pterodactyl's writable
-# server directory. The Dockerfile symlinks Tomcat's work path here.
-mkdir -p /home/container/work/cache /home/container/work/files \
-  /home/container/work/plugins /home/container/work/logs
+# Persist Tomcat's mutable files under Pterodactyl's writable server directory.
+mkdir -p /home/container/headwind/work/cache /home/container/headwind/work/files \
+  /home/container/headwind/work/plugins /home/container/headwind/work/logs \
+  /home/container/headwind/webapps /home/container/headwind/config
 
-# cloudflared can log its environment-variable names and values. Put the token
-# in a private file, remove it from the environment, then use --token-file.
+# Restore bundled webapp defaults into the writable path on a fresh server.
+if [ -d /opt/headwind-ptero-defaults/webapps ] && [ -z "$(ls -A /home/container/headwind/webapps 2>/dev/null || true)" ]; then
+  cp -a /opt/headwind-ptero-defaults/webapps/. /home/container/headwind/webapps/
+fi
+
+# Upstream's readiness psql command omits -p, so honor the egg's SQL_PORT via
+# libpq's PGPORT. The ROOT.xml template also substitutes SQL_PORT directly.
+export PGPORT="${SQL_PORT:-5432}"
+
+# cloudflared can log its environment. Store the token privately, then remove
+# it from the environment before launching cloudflared.
 TOKEN_FILE=/home/container/.cloudflared-token
 umask 077
 printf '%s' "$CLOUDFLARE_TUNNEL_TOKEN" > "$TOKEN_FILE"
 unset CLOUDFLARE_TUNNEL_TOKEN
 
-cloudflared tunnel --no-autoupdate run --token-file "$TOKEN_FILE" &
+# HTTP/2 uses outbound TCP 7844. QUIC requires UDP 7844; forcing HTTP/2 avoids
+# QUIC retries where UDP is blocked (TCP 7844 must still be allowed).
+cloudflared tunnel --no-autoupdate --protocol http2 run --token-file "$TOKEN_FILE" &
 TUNNEL_PID=$!
 
 /docker-entrypoint.sh &
