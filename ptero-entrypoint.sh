@@ -20,7 +20,15 @@ fi
 # Persist Tomcat's mutable files under Pterodactyl's writable server directory.
 mkdir -p /home/container/headwind/work/cache /home/container/headwind/work/files \
   /home/container/headwind/work/plugins /home/container/headwind/work/logs \
-  /home/container/headwind/webapps /home/container/headwind/config
+  /home/container/headwind/webapps /home/container/headwind/config \
+  /home/container/headwind/tmp
+
+# Java ImageIO (including Headwind's QR PNG generation) needs writable temp
+# storage. Tomcat otherwise defaults to /usr/local/tomcat/temp on the readonly
+# container filesystem.
+export CATALINA_TMPDIR=/home/container/headwind/tmp
+JAVA_OPTS="${JAVA_OPTS:-} -Djava.io.tmpdir=${CATALINA_TMPDIR}"
+export JAVA_OPTS
 
 # Generate a writable Tomcat config from the upstream image template every boot,
 # replacing its fixed HTTP port (8080) with the server's assigned allocation.

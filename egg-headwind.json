@@ -10,7 +10,7 @@
   "description": "Headwind MDM web panel using the upstream container, external PostgreSQL, and an in-container Cloudflare Tunnel.",
   "features": null,
   "docker_images": {
-    "Headwind custom image": "ghcr.io/forestfire2397/headwind-mdm-egg:latest"
+    "Headwind custom image (build and publish first)": "ghcr.io/forestfire2397/headwind-mdm-egg:latest"
   },
   "file_denylist": [],
   "startup": "/ptero-entrypoint.sh",
@@ -30,21 +30,12 @@
   "variables": [
     {
       "name": "Public domain",
-      "description": "Public Headwind hostname without scheme, e.g. mdm.example.com. Configure the Cloudflare Tunnel public hostname to http://localhost:8080.",
+      "description": "Public Headwind hostname without scheme, e.g. mdm.example.com. Set the Cloudflare Tunnel origin to http://127.0.0.1:<SERVER_PORT>.",
       "env_variable": "BASE_DOMAIN",
       "default_value": "mdm.example.com",
       "user_viewable": true,
       "user_editable": true,
       "rules": "required|string|max:253"
-    },
-    {
-      "name": "Primary allocation / HTTP port",
-      "description": "Must match the server's primary Pterodactyl allocation. Headwind's HTTP connector listens on this port inside the container.",
-      "env_variable": "SERVER_PORT",
-      "default_value": "{{server.build.default.port}}",
-      "user_viewable": true,
-      "user_editable": false,
-      "rules": "required|integer|min:1|max:65535"
     },
     {
       "name": "Cloudflare Tunnel token",
